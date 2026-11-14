@@ -1,0 +1,57 @@
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ACCESS_LETTER_TABLE(letterTable, letter)             (*((letterTable) + ((toupper((letter)) - 'A') + (!!islower((letter))) * 26)))
+
+#define LETTER_TABLE_LENGTH                                 (52lu)
+#define ISVOWEL(letter)                                     (strchr("AEIOUaeiou", (letter)))
+
+int *createLetterTable(const char *word)
+{
+    int * const letterTable = calloc(LETTER_TABLE_LENGTH, sizeof(int));
+    if (!letterTable)
+        return NULL;
+
+    for (size_t i = 0lu;*(word + i);++i)
+        ++ACCESS_LETTER_TABLE(letterTable, *(word + i));
+    
+
+    return letterTable;
+}
+
+int getNextVowel(int *letterTable)
+{
+    static int *currentLetterTable = NULL;
+    const char * const vowels = "AEIOUaeiou";
+    static char* currentVowelPoint = NULL;
+
+    if (currentLetterTable != letterTable){
+        currentLetterTable = letterTable;
+        currentVowelPoint = vowels;
+    }
+
+    for (;*currentVowelPoint;){
+        if (ACCESS_LETTER_TABLE(letterTable, *currentVowelPoint)-- > 0)
+            return *currentVowelPoint;
+
+        ++currentVowelPoint;
+    }
+
+    return -1;
+}
+
+char* sortVowels(char* s) {
+    int *letterTable = createLetterTable(s);
+    if (!letterTable)
+        exit(EXIT_FAILURE);
+
+    for (char *currentPoint = s;*currentPoint;++currentPoint){
+        int nextVowel = 0;
+
+        if (ISVOWEL(*currentPoint) && (nextVowel = getNextVowel(letterTable)) != -1)
+            *currentPoint = nextVowel;
+    }
+
+    return s;
+}
