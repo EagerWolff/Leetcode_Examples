@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+struct VersionObj{
+    char *string;
+    int lastIndex;
+};
+
+static struct VersionObj *createVersionObj(const char *versionString){
+    struct VersionObj * const obj = malloc(sizeof(struct VersionObj));
+    if (!obj)
+        return NULL;
+
+    obj->string = (char *)versionString;
+    obj->lastIndex = 0;
+
+    return obj;
+}
+
+static int getNextSubversionValue(struct VersionObj *obj)
+{
+    if (obj->lastIndex == -1)
+        return 0;
+
+    const int currentValue = atoi(obj->string + obj->lastIndex);
+    const char * const searchResult = strchr(obj->string + obj->lastIndex, '.');
+    if (!searchResult){
+        obj->lastIndex = -1;
+        return currentValue;
+    }
+
+    obj->lastIndex = (searchResult - obj->string) + 1;
+
+    return currentValue;
+}
+
+int compareVersion(char* version1, char* version2) 
+{
+    struct VersionObj * const version1Obj = createVersionObj(version1);
+    if (!version1Obj)
+        goto FAIL_1;
+    struct VersionObj * const version2Obj = createVersionObj(version2);
+    if (!version2Obj)
+        goto FAIL_2;
+
+
+    for (;;){
+        const int currentValueVersion1 = getNextSubversionValue(version1Obj);
+        const int currentValueVersion2 = getNextSubversionValue(version2Obj);
+
+        if (currentValueVersion1 > currentValueVersion2)
+            return 1;
+        if (currentValueVersion2 > currentValueVersion1)
+            return -1;
+
+        if (version1Obj->lastIndex == -1 && version2Obj->lastIndex == -1)
+            break;
+    }
+
+    free(version1Obj);
+    free(version2Obj);
+
+    return 0;
+
+    FAIL_2:
+    free(version1Obj);
+    FAIL_1:
+    fprintf(stderr, "Heap memory allocation failed.\n");
+    exit(EXIT_FAILURE);
+
+    return 0;
+}
