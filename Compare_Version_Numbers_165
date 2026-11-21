@@ -45,15 +45,21 @@ int compareVersion(char* version1, char* version2)
     if (!version2Obj)
         goto FAIL_2;
 
+    int return_value = 0;
+
 
     for (;;){
         const int currentValueVersion1 = getNextSubversionValue(version1Obj);
         const int currentValueVersion2 = getNextSubversionValue(version2Obj);
 
-        if (currentValueVersion1 > currentValueVersion2)
-            return 1;
-        if (currentValueVersion2 > currentValueVersion1)
-            return -1;
+        if (currentValueVersion1 > currentValueVersion2){
+            return_value = 1;
+            break;
+        }
+        if (currentValueVersion2 > currentValueVersion1){
+            return_value = -1;
+            break;
+        }
 
         if (version1Obj->lastIndex == -1 && version2Obj->lastIndex == -1)
             break;
@@ -62,7 +68,7 @@ int compareVersion(char* version1, char* version2)
     free(version1Obj);
     free(version2Obj);
 
-    return 0;
+    return return_value;
 
     FAIL_2:
     free(version1Obj);
