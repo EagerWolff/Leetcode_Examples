@@ -13,17 +13,21 @@ static bool historyCompare(const char *stringToBeValidated, const char *historyS
 
     const size_t testLength = strlen(stringToBeValidated);
 
+    bool result = true;
+
     for (size_t i = 0lu;i < testLength;++i){
         if (!*(charHistory + *(stringToBeValidated + i)))
             *(charHistory + *(stringToBeValidated + i)) = *(historySource + i);
-        else if (*(charHistory + *(stringToBeValidated + i)) && *(charHistory + *(stringToBeValidated + i)) != *(historySource + i))
-            return false;
+        else if (*(charHistory + *(stringToBeValidated + i)) && *(charHistory + *(stringToBeValidated + i)) != *(historySource + i)){
+            result = false;
+            break;
+        }
     }
 
     free(charHistory);
 
 
-    return true;
+    return result;
 }
 
 bool isIsomorphic(char* s, char* t) 
