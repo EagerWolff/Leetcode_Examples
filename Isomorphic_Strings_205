@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-bool historyCompare(const char *stringToBeValidated, const char *historySource)
+static bool historyCompare(const char *stringToBeValidated, const char *historySource)
 {
     char * const charHistory = calloc(128lu, 1lu);
     if (!charHistory){
